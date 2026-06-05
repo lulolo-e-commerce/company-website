@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluating agentic systems in production — LULOLO Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../blog.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="../blog.html" class="logo">
+        <span class="slash">//</span><span class="name">lulolo</span><span class="suffix">.backend</span><span class="section-suffix">/ blog</span>
+      </a>
+      <nav class="nav-links tag-filter" id="tagFilter">
+        <a data-tag="Engineering">Engineering</a>
+        <a data-tag="Distributed Systems">Distributed Systems</a>
+        <a data-tag="Data">Data</a>
+        <a data-tag="Agents">Agents</a>
+        <a data-tag="Reliability">Reliability</a>
+      </nav>
+      <div class="nav-right">
+        <a href="../index.html" class="nav-signin">← Main site</a>
+        <button class="btn btn-ghost btn-mono">subscribe</button>
+      </div>
+    </div>
+  </header>
+  <article class="post-top">
+    <div class="prose-wrap">
+      <a class="back-link meta-mono" href="../blog.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> all posts</a>
+      <div class="post-head-row">
+        <span class="tag-chip">Agents</span>
+        <span class="meta-mono">11 min read</span>
+      </div>
+      <h1 class="post-title">Evaluating agentic systems in production</h1>
+      <div class="post-byline">
+        <div class="byline">
+          <div class="avatar" style="width:40px;height:40px;font-size:14px;">WC</div>
+          <div style="line-height:1.35;">
+            <div class="name" style="font-size:14px;">Wei Chen</div>
+            <div class="role">Engineering Lead · Apr 28, 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="prose">
+<p>An agent that scores well on a static eval set can still fail constantly in production, because production is not a static eval set. Tools time out, inputs are adversarial, and the cost of a wrong action is real.</p>
+<h2>Three signals we trust</h2>
+<ul><li>Task completion against a graded rubric, sampled from live traffic and scored asynchronously.</li><li>Tool-call validity — did the agent call real tools with well-formed arguments?</li><li>Cost and latency per resolved task, not per token. Tokens are an input; resolved tasks are the output.</li></ul>
+<blockquote>We don’t ask “is the model good?” We ask “is this agent, with these tools, resolving these tasks, today?”</blockquote>
+<p>The harness runs continuously, samples a fraction of real sessions, and pages us on regression — the same way we’d treat a latency SLO.</p>
+      </div>
+    </div>
+  </article>
+
+
+  <footer class="site-footer">
+    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;">
+      <span class="meta-mono">© 2026 LULOLO — //lulolo.backend</span>
+      <span class="meta-mono" style="display:flex;align-items:center;gap:8px;"><span class="status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;"></span> RSS · @lulolo</span>
+    </div>
+  </footer>
+</body>
+</html>

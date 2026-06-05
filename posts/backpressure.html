@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backpressure is a feature, not a failure — LULOLO Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../blog.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="../blog.html" class="logo">
+        <span class="slash">//</span><span class="name">lulolo</span><span class="suffix">.backend</span><span class="section-suffix">/ blog</span>
+      </a>
+      <nav class="nav-links tag-filter" id="tagFilter">
+        <a data-tag="Engineering">Engineering</a>
+        <a data-tag="Distributed Systems">Distributed Systems</a>
+        <a data-tag="Data">Data</a>
+        <a data-tag="Agents">Agents</a>
+        <a data-tag="Reliability">Reliability</a>
+      </nav>
+      <div class="nav-right">
+        <a href="../index.html" class="nav-signin">← Main site</a>
+        <button class="btn btn-ghost btn-mono">subscribe</button>
+      </div>
+    </div>
+  </header>
+  <article class="post-top">
+    <div class="prose-wrap">
+      <a class="back-link meta-mono" href="../blog.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> all posts</a>
+      <div class="post-head-row">
+        <span class="tag-chip">Distributed Systems</span>
+        <span class="meta-mono">7 min read</span>
+      </div>
+      <h1 class="post-title">Backpressure is a feature, not a failure</h1>
+      <div class="post-byline">
+        <div class="byline">
+          <div class="avatar" style="width:40px;height:40px;font-size:14px;">TR</div>
+          <div style="line-height:1.35;">
+            <div class="name" style="font-size:14px;">Tomas Reyes</div>
+            <div class="role">Staff Engineer · May 9, 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="prose">
+<p>There’s a failure mode every distributed system eventually meets: it accepts more work than it can finish, queues build everywhere at once, and the whole thing tips over while reporting that it’s healthy.</p>
+<p>The fix isn’t more capacity. It’s the willingness to refuse work. Backpressure — propagating “slow down” signals upstream — is what keeps a system inside its safe operating envelope.</p>
+<h2>Bounded everything</h2>
+<p>Our rule is simple: every queue is bounded, every pool is bounded, every retry budget is bounded. An unbounded queue is just a memory leak with good intentions.</p>
+<pre><code><span class="k">let </span><span class="n">tx</span><span class="">, rx = mpsc::</span><span class="n">channel</span><span class="">(1024); </span><span class="c">// bounded</span></code></pre>
+<p>When the channel is full, the sender waits or sheds — and that wait is the backpressure signal travelling upstream, all the way to the client if it has to.</p>
+<h2>Say no early</h2>
+<p>A request you can’t serve should be rejected at the edge in single-digit milliseconds, not after it has consumed a connection, a thread, and a database round-trip. Fast rejection is kinder than slow failure.</p>
+      </div>
+    </div>
+  </article>
+
+
+  <footer class="site-footer">
+    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;">
+      <span class="meta-mono">© 2026 LULOLO — //lulolo.backend</span>
+      <span class="meta-mono" style="display:flex;align-items:center;gap:8px;"><span class="status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;"></span> RSS · @lulolo</span>
+    </div>
+  </footer>
+</body>
+</html>

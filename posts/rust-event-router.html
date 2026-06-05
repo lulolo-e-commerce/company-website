@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why we rewrote our event router in Rust — LULOLO Blog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../blog.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="../blog.html" class="logo">
+        <span class="slash">//</span><span class="name">lulolo</span><span class="suffix">.backend</span><span class="section-suffix">/ blog</span>
+      </a>
+      <nav class="nav-links tag-filter" id="tagFilter">
+        <a data-tag="Engineering">Engineering</a>
+        <a data-tag="Distributed Systems">Distributed Systems</a>
+        <a data-tag="Data">Data</a>
+        <a data-tag="Agents">Agents</a>
+        <a data-tag="Reliability">Reliability</a>
+      </nav>
+      <div class="nav-right">
+        <a href="../index.html" class="nav-signin">← Main site</a>
+        <button class="btn btn-ghost btn-mono">subscribe</button>
+      </div>
+    </div>
+  </header>
+  <article class="post-top">
+    <div class="prose-wrap">
+      <a class="back-link meta-mono" href="../blog.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> all posts</a>
+      <div class="post-head-row">
+        <span class="tag-chip">Engineering</span>
+        <span class="meta-mono">9 min read</span>
+      </div>
+      <h1 class="post-title">Why we rewrote our event router in Rust</h1>
+      <div class="post-byline">
+        <div class="byline">
+          <div class="avatar" style="width:40px;height:40px;font-size:14px;">MH</div>
+          <div style="line-height:1.35;">
+            <div class="name" style="font-size:14px;">Mira Halvorsen</div>
+            <div class="role">Principal Engineer · May 18, 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="prose">
+<p>Our event router sits in front of everything. Every request, every webhook, every agent callback passes through it before it reaches a service. For three years it was a JVM application, and for most of those three years that was fine.</p>
+<p>Then our p99 started telling a story our averages hid. Median latency was a clean 4ms. The 99th percentile wandered between 30ms and 200ms with no obvious cause — no traffic spike, no slow downstream. The cause, it turned out, was the garbage collector.</p>
+<h2>Measuring before rewriting</h2>
+<p>The first rule of a rewrite is to earn it. We instrumented the router with detailed GC tracing and correlated pause times against the latency histogram. The correlation was almost perfect: every tail-latency excursion lined up with a young-generation collection.</p>
+<pre><code><span class="c">// p99 latency vs GC pause, 24h window</span>
+<span class="k">correlation</span><span class="">(p99_ms, gc_pause_ms) = 0.94</span></code></pre>
+<p>A 0.94 correlation is not a subtle hint. We weren’t going to tune our way out of it; the allocation pattern of a router — millions of short-lived envelope objects — is close to the worst case for a generational collector.</p>
+<h2>What Rust bought us</h2>
+<p>We rewrote the hot path — parse, route, dispatch — in Rust, leaving the control plane in Java. The results, after two weeks in production behind a canary:</p>
+<ul><li>p99 dropped from a noisy 30–200ms to a flat 12ms.</li><li>Memory footprint fell by 60%, because there is no heap headroom to reserve for a collector.</li><li>The service stopped having “moods.” Latency became boring, which is the highest compliment we pay a system.</li></ul>
+<blockquote>The goal was never “Rust is faster.” It was “make the tail predictable.” Predictability is the feature.</blockquote>
+<h2>What it didn’t buy us</h2>
+<p>Rust did not make us faster on the median — the JVM was already excellent there. It cost us in iteration speed for the first month while the team built fluency, and it added a build-time dependency story we had to invest in. We would make the same call again, but only for the hot path, and only because we had the histogram to justify it.</p>
+      </div>
+    </div>
+  </article>
+
+
+  <footer class="site-footer">
+    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;">
+      <span class="meta-mono">© 2026 LULOLO — //lulolo.backend</span>
+      <span class="meta-mono" style="display:flex;align-items:center;gap:8px;"><span class="status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;"></span> RSS · @lulolo</span>
+    </div>
+  </footer>
+</body>
+</html>
